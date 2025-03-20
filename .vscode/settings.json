@@ -2,6 +2,7 @@
     "python.analysis.autoFormatStrings": true,
     "python.analysis.stubPath": "typings",
     "python.analysis.extraPaths": [
+        "Lib",
         "TDImportCache/Lib",
         "C:/Program Files/Derivative/TouchDesigner.2023.12000/bin/Lib"
     ],
