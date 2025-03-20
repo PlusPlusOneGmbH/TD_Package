@@ -25,3 +25,6 @@ We can now streight up use ```mod.Import.Tox("SimpleTest")``` in any Comp to get
 TD_PIP is designed as an on-demand packagemanager.
 Idealy we would have a package-browser which could install and write the package to a package.json like file, just like npm-install does (which is so much better then everything PIP is doing, fight me!)
 We could then, for deployment, use that package.json to preinstall all dependencies without having to rely on the on-demand nature of TD-PIP as is right now.
+
+It would also be extremly important that we can define an external library on a per-project basis naively in TD, without having to rely on elements like TD_PIP, so we could import Extension for type-completion free of charge! 
+Right now this requires the Mounting-paradigm of TD-Pip to work, which is not nicely feasable.
