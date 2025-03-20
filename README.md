@@ -1,14 +1,27 @@
-# TD-Prefab
-This project can be used as a boilerplate to base future projects off of.
+Extremly rough testingground for a PythonPackage based distribution and import pattern for TouchDesigner.
+The system is based TD_PIP in its core, localized in the local/modules of the project, to allow a quick and easy way of refferencing a package.
+A package should contain a simple initfile, pointing to the ToxFile using the ```__file__``` property.
+```python
+from pathlib import Path
+ToxFile = Path( Path( __file__ ).parent, "Release.tox" )
+```
+Next to the init we have the ToxFile named Release.tox
 
-# Description
-Tell us something about this project.
+We can now use TD_PIP pointing at that library to Import the package on demand and returning the ToxFile attribute.
+```python
+def Tox(packageName, pipPackageName = ""):
+    with op("td_pip").MountModule( packageName, pipPackageName = pipPackageName ) as mountedPackage:
+        return mountedPackage.ToxFile
+```
 
-# Version
-2023.12000 LTS
 
-# Notes
-Never have anything config, log or similiar related inside the repository.
-Do not push to this repository with any kind of project related stuff.
-Us this only as a boilerplate.
 
+We can now streight up use ```mod.Import.Tox("SimpleTest")``` in any Comp to get the path to the ToxFile.
+
+![grafik](https://github.com/user-attachments/assets/8dc356c3-7c4d-4510-b35a-c8e00a9b6292)
+
+
+### thoughts
+TD_PIP is designed as an on-demand packagemanager.
+Idealy we would have a package-browser which could install and write the package to a package.json like file, just like npm-install does (which is so much better then everything PIP is doing, fight me!)
+We could then, for deployment, use that package.json to preinstall all dependencies without having to rely on the on-demand nature of TD-PIP as is right now.
