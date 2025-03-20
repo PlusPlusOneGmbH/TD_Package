@@ -27,4 +27,6 @@ Idealy we would have a package-browser which could install and write the package
 We could then, for deployment, use that package.json to preinstall all dependencies without having to rely on the on-demand nature of TD-PIP as is right now.
 
 It would also be extremly important that we can define an external library on a per-project basis naively in TD, without having to rely on elements like TD_PIP, so we could import Extension for type-completion free of charge! 
-Right now this requires the Mounting-paradigm of TD-Pip to work, which is not nicely feasable.
+Right now this requires the Mounting-paradigm of TD-Pip to work, which is pretty cumbersome (but works!)
+![grafik](https://github.com/user-attachments/assets/ff06c57c-061c-4441-ba0e-ef4b07799025)
+
