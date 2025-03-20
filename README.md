@@ -30,3 +30,10 @@ It would also be extremly important that we can define an external library on a 
 Right now this requires the Mounting-paradigm of TD-Pip to work, which is pretty cumbersome (but works!)
 ![grafik](https://github.com/user-attachments/assets/ff06c57c-061c-4441-ba0e-ef4b07799025)
 
+For this to work we need unified tooling to Export a COMP with extension and the correct ```__init__``` file and refferences. 
+And a browser.
+And a package.json.
+And an external installer/manager (+ the internal browser)
+And a package repository to work off of!
+
+It is too late, I have to go to bed....
