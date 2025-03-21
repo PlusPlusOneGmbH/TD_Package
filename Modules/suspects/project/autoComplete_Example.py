@@ -4,9 +4,6 @@ Author : Wieland PlusPlusOne@AMB-ZEPH15
 Saveorigin : Project.toe
 Saveversion : 2023.12000
 Info Header End'''
-with mod.Import.MountModule("SimpleTest"):
-    from SimpleTest.extTestExtension import extTestExtension
+from SimpleTest import Typing as Base1COMP
 
-from typing import Union
-targetComp:Union[COMP, extTestExtension] = op("base1")
-targetComp.Foobar()
+myComponent:Base1COMP = op("base1")
