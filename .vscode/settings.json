@@ -1,10 +1,8 @@
 {
     "python.analysis.autoFormatStrings": true,
-    "python.analysis.stubPath": "typings",
     "python.analysis.extraPaths": [
         "Lib",
         "TDImportCache/Lib",
-        "C:/Program Files/Derivative/TouchDesigner.2023.12000/bin/Lib"
     ],
-    "python.defaultInterpreterPath": "C:/Program Files/Derivative/TouchDesigner.2023.12000/bin/python.exe"
+    "python.defaultInterpreterPath": "C:/Program Files/Derivative/TouchDesigner.2023.31378/bin"
 }
