@@ -1,0 +1,3 @@
+
+# include all tox files (which would otherwise be excluded.)
+include *~ *.tox

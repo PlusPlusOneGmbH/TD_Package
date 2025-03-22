@@ -1,0 +1,14 @@
+LICENSE
+MANIFEST.in
+README.md
+pyproject.toml
+dist/simpletest-0.1-py3-none-any.whl
+dist/simpletest-0.1.tar.gz
+src/SimpleTest/Release.tox
+src/SimpleTest/_Typing.py
+src/SimpleTest/__init__.py
+src/SimpleTest/extTestExtension.py
+src/SimpleTest.egg-info/PKG-INFO
+src/SimpleTest.egg-info/SOURCES.txt
+src/SimpleTest.egg-info/dependency_links.txt
+src/SimpleTest.egg-info/top_level.txt

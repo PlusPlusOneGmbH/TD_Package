@@ -6,3 +6,5 @@ Configs/Local
 
 .vscode/launch.json
 Lib/*/__pycache__
+Build/dist
+.docker

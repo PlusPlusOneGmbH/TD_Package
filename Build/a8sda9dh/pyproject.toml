@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "SimpleTest"
+version = "0.1"
+authors = [
+  { name="Wieland Hilker", email="Wieland@PlusPlus.One" }
+]
+description = "A package built specifically for TouchDesigner wih a ToxFile"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.11"
+keywords = ["TouchDesigner", "Example"]
+classifiers = [
+    "TouchDesigner Environment :: 2023.3XXXX",
+    "Programming Language :: Python :: 3",
+    "Operating System :: Windows"
+]
+
+[project.urls]
+Homepage = "https://github.com/pypa/sampleproject"
+Issues = "https://github.com/pypa/sampleproject/issues"
