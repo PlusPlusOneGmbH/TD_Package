@@ -1,3 +1,6 @@
+
+![Firefly a euro palette full of different crates and boxes filled to the brim with bananas 20284](https://github.com/user-attachments/assets/f99a642a-b3c6-42c8-9f2a-f17d1e444678)
+
 Extremly rough testingground for a PythonPackage based distribution and import pattern for TouchDesigner.
 The system is based TD_PIP in its core, localized in the local/modules of the project, to allow a quick and easy way of refferencing a package.
 A package should contain a simple initfile, pointing to the ToxFile using the ```__file__``` property.
