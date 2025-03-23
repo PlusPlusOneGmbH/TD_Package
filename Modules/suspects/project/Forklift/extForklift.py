@@ -21,11 +21,11 @@ class extForklift:
 		self.ownerComp = ownerComp
 
 	def createMetaComp(self, targetComp):
-		metaComp:COMP = targetComp.copy(self.ownerComp.op("Package_Meta"))
+		metaComp:COMP = targetComp.copy(self.ownerComp.op("Package_Meta_Prefab"), name = "Package_Meta")
 		ui.messageBox("New Setup", "It seems like you are preparing a COMP. Please take a moment to fill out some Meta-Data")
 		metaComp.openParameters()
 		metaComp.openViewer()
-		metaComp.op("ReadmeMaker").Repo.openViewer()
+		metaComp.op("ReadmeRepo").Repo.openViewer()
 		return metaComp
 
 
@@ -83,13 +83,13 @@ class extForklift:
 			
 		buildDir = Path( _buildDir )
 		buildDir.mkdir(exist_ok=True, parents=True)
-		metaComp.par.Licensedat.eval().save(
+		metaComp.op("LicenseRepo").Repo.save(
 			Path(buildDir, "LICENSE")
 		)
-		metaComp.op("ManifestIn").save(
+		metaComp.op("ManifestRepo").Repo.save(
 			Path(buildDir, "MANIFEST.in")
 		)
-		metaComp.op("ReadmeMaker").Repo.save(
+		metaComp.op("ReadmeRepo").Repo.save(
 			Path(buildDir, "README.md")
 		)
 
