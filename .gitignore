@@ -8,3 +8,5 @@ Configs/Local
 Lib/*/__pycache__
 Build/dist
 .docker
+.pypirc
+pip

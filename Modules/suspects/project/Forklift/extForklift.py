@@ -10,6 +10,8 @@ from tempfile import TemporaryDirectory
 from pathlib import Path
 import json
 import sys
+from os import listdir
+from uuid import uuid4
 class extForklift:
 	"""
 	extForklift description
@@ -27,13 +29,16 @@ class extForklift:
 		return metaComp
 
 
-	def Build(self, targetComp):
-		self.PrepareComp( targetComp )
-		self.ExecuteBuild(
-			self.PrepareBuild(
-				targetComp
-			)
-		)
+	def Build(self, targetComp, publish = True, TempOutput = True):
+		with TemporaryDirectory() as _buildDir:
+			if not TempOutput:
+				_buildDir = Path("TDImportCache", str(uuid4()))
+				_buildDir.mkdir( parents=True, exist_ok = False)
+			self.PrepareComp( targetComp )
+			self.PrepareBuild( targetComp, _buildDir)
+			self.ExecuteBuild( _buildDir )
+			if publish: self.ExecutePublish( _buildDir )
+			self.ownerComp.op("logger").Log("Finished", _buildDir)
 
 	def PrepareComp(self, targetComp:COMP):
 		metaComp = targetComp.op("Package_Meta") or self.createMetaComp(targetComp)
@@ -71,68 +76,66 @@ class extForklift:
 		return Path( targetComp.save( Path(targetDir, f"{targetComp.name}.tox")) )
 
 
-	def PrepareBuild(self, _targetComp:COMP):
+	def PrepareBuild(self, _targetComp:COMP, _buildDir):
 		targetComp = self.ownerComp.op("Schleuse").copy( _targetComp )
 		metaComp = targetComp.op("Package_Meta")
-		with TemporaryDirectory() as _buildDir:
+		
 			
-			# buildDir = Path( _buildDir )
-			buildDir = Path( "TDImportCache", "BuildTesting")
-			buildDir.mkdir(exist_ok=True, parents=True)
-			metaComp.par.Licensedat.eval().save(
-				Path(buildDir, "LICENSE")
+		buildDir = Path( _buildDir )
+		buildDir.mkdir(exist_ok=True, parents=True)
+		metaComp.par.Licensedat.eval().save(
+			Path(buildDir, "LICENSE")
+		)
+		metaComp.op("ManifestIn").save(
+			Path(buildDir, "MANIFEST.in")
+		)
+		metaComp.op("ReadmeMaker").Repo.save(
+			Path(buildDir, "README.md")
+		)
+
+
+
+
+		with Path(buildDir, "pyproject.toml").open("+wt") as projectToml:
+			projectToml.write(
+				self.ownerComp.op("prefabPyProject").text.format(**{
+					"Name" : metaComp.par.Name.eval(),
+					"Version" : f"{metaComp.par.Version1}.{metaComp.par.Version2}",
+					"Dependencies" : json.dumps([
+						cell.val for cell in ( 
+							targetComp.op("dependencies") or 
+							self.ownerComp.op("empty")
+						).col(0)
+					]),
+					"Authors" : json.dumps([{
+						"name" : block.par.Name.eval(), "email" : block.par.Email.eval()
+					} for block in metaComp.seq.Authors]).replace(":", "="), #Oh my god. Why python WHY? Why use TOML, not have a writer in hand and then NOT AHDEAR TO JSON!!!
+					"Description" : metaComp.par.Description.eval(),
+					"License" : metaComp.par.License.eval(),
+					"PythonVersion" : f">={sys.version_info.major}.{sys.version_info.minor}",
+					"Keywords" : json.dumps(["TouchDesigner"] + [
+						block.par.Keyword.eval() for block in metaComp.seq.Keywords
+					]),
+					"URLs" : f"\n".join([
+						f'{block.par.Name.eval()}="{block.par.Url.eval()}"' for block in metaComp.seq.Urls
+					]),
+					"Build" : app.build
+				})
 			)
-			metaComp.op("ManifestIn").save(
-				Path(buildDir, "MANIFEST.in")
+
+		srcFolder = Path(buildDir, "src", metaComp.par.Name.eval() )
+		srcFolder.mkdir( parents=True, exist_ok=True)
+		savedTox = self.SaveComp( targetComp, srcFolder )
+		
+		with Path( srcFolder , "__init__.py").open("+wt") as initFile:
+			initFile.write(
+				self.ownerComp.op("prefabInit").text.format(**{
+					"Filename" : savedTox.name,
+					"Version" : f"{metaComp.par.Version1}.{metaComp.par.Version2}"
+				})
 			)
-			metaComp.op("ReadmeMaker").Repo.save(
-				Path(buildDir, "README.md")
-			)
-
-
-
-
-			with Path(buildDir, "pyproject.toml").open("+wt") as projectToml:
-				projectToml.write(
-					self.ownerComp.op("prefabPyProject").text.format(**{
-						"Name" : metaComp.par.Name.eval(),
-						"Version" : f"{metaComp.par.Version1}.{metaComp.par.Version2}",
-						"Dependencies" : json.dumps([
-							cell.val for cell in ( 
-								targetComp.op("dependencies") or 
-		   						self.ownerComp.op("empty")
-							).col(0)
-						]),
-						"Authors" : json.dumps([{
-							"name" : block.par.Name.eval(), "email" : block.par.Email.eval()
-						} for block in metaComp.seq.Authors]).replace(":", "="), #Oh my god. Why python WHY? Why use TOML, not have a writer in hand and then NOT AHDEAR TO JSON!!!
-						"Description" : metaComp.par.Description.eval(),
-						"License" : metaComp.par.License.eval(),
-						"PythonVersion" : f">={sys.version_info.major}.{sys.version_info.minor}",
-						"Keywords" : json.dumps(["TouchDesigner"] + [
-							block.par.Keyword.eval() for block in metaComp.seq.Keywords
-						]),
-						"URLs" : f"\n".join([
-							f'{block.par.Name.eval()}="{block.par.Url.eval()}"' for block in metaComp.seq.Urls
-						]),
-						"Build" : app.build
-					})
-				)
-
-			srcFolder = Path(buildDir, "src", metaComp.par.Name.eval() )
-			srcFolder.mkdir( parents=True, exist_ok=True)
-			savedTox = self.SaveComp( targetComp, srcFolder )
-			
-			with Path( srcFolder , "__init__.py").open("+wt") as initFile:
-				initFile.write(
-					self.ownerComp.op("prefabInit").text.format(**{
-						"Filename" : savedTox.name,
-						"Version" : f"{metaComp.par.Version1}.{metaComp.par.Version2}"
-					})
-				)
-
-			targetComp.destroy()
-			return buildDir
+		targetComp.destroy()
+		return buildDir
 		
 	def ExecuteBuild(self, buildDir:Path):
 		with self.ownerComp.op("TD_Conda").EnvShell() as BuildShell:
@@ -140,4 +143,22 @@ class extForklift:
 			BuildShell.Execute("python -m build")
 
 
-				
+	def ExecutePublish(self, buildDir:Path):
+		"""
+			Actually Upload to the repository using twine.
+			Right now actually uses cloudsmith. Wold 
+		"""
+		if not Path(".pypirc").is_file():
+			raise Exception("Missing .pypirc file for twine!")
+		with self.ownerComp.op("TD_Conda").EnvShell() as BuildShell:	
+			BuildShell.Execute(f"python -m twine upload {buildDir}\\dist\\*.whl -r cloudsmith --config-file .pypirc")
+		return
+		# Might not be needed actually
+		for _subItem in listdir(Path(buildDir, "dist")):
+			subItem = Path(buildDir, "dist", _subItem)
+			debug( subItem )
+			if subItem.is_file() and subItem.suffix == ".whl":
+				with self.ownerComp.op("TD_Conda").EnvShell() as BuildShell:
+					#BuildShell.Execute(f"cd {buildDir.absolute()}")
+					BuildShell.Execute(f"python -m twine upload -r cloudsmith {subItem} --config-file .pypirc")
+					break
