@@ -99,7 +99,7 @@ class extForklift:
 		with Path(buildDir, "pyproject.toml").open("+wt") as projectToml:
 			projectToml.write(
 				self.ownerComp.op("prefabPyProject").text.format(**{
-					"Name" : metaComp.par.Name.eval(),
+					"Name" : f"tdp-{metaComp.par.Name.eval()}",
 					"Version" : f"{metaComp.par.Version1}.{metaComp.par.Version2}",
 					"Dependencies" : json.dumps([
 						cell.val for cell in ( 
@@ -113,7 +113,7 @@ class extForklift:
 					"Description" : metaComp.par.Description.eval(),
 					"License" : metaComp.par.License.eval(),
 					"PythonVersion" : f">={sys.version_info.major}.{sys.version_info.minor}",
-					"Keywords" : json.dumps(["TouchDesigner"] + [
+					"Keywords" : json.dumps(["TouchDesigner", app.build] + [
 						block.par.Keyword.eval() for block in metaComp.seq.Keywords
 					]),
 					"URLs" : f"\n".join([
@@ -151,7 +151,7 @@ class extForklift:
 		if not Path(".pypirc").is_file():
 			raise Exception("Missing .pypirc file for twine!")
 		with self.ownerComp.op("TD_Conda").EnvShell() as BuildShell:	
-			BuildShell.Execute(f"python -m twine upload {buildDir}\\dist\\*.whl -r cloudsmith --config-file .pypirc")
+			BuildShell.Execute(f"python -m twine upload {buildDir}\\dist\\*.whl -r {self.ownerComp.par.Index.eval()} --config-file .pypirc --verbose")
 		return
 		# Might not be needed actually
 		for _subItem in listdir(Path(buildDir, "dist")):
