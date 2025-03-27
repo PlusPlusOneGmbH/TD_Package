@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tdp-queriedWebclient"
+version = "1.9"
+dependencies = []
+authors = [{"name"= "PlusPlus Test", "email"= "Hello@PlusPlus.One"}]
+description = "A webclient Component for async webrequests."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.11"
+keywords = ["TouchDesigner", "2023.31378", "Web", "REST", "HTTP"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: Microsoft :: Windows"
+]
+
+[project.urls]
+TouchDesigner="https://deriative.ca"
