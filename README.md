@@ -3,6 +3,8 @@
 
 # A proposal for PackageManagement in TouchDesigner
 
+Runs on TouchDesigner 2023.3XXXX Alpha Builds
+
 ## TDP - A Standart for TouchDesigner Packaging
 TDP is short TouchDesignerPackage and defines a simple standart in which TouchDesigner components should be packaged so they are easily accessable for Developers, but also non-dev users of the platform.
 
