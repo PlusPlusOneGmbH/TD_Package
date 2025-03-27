@@ -41,18 +41,18 @@ class extForklift:
 		return metaComp
 
 
-	def Build(self, targetComp, publish = True, TempOutput = True):
+	def Rundown(self, targetComp, TempOutput = True):
 		with TemporaryDirectory() as _buildDir:
 			if not TempOutput:
 				_buildDir = Path("TDImportCache", str(uuid4()))
 				_buildDir.mkdir( parents=True, exist_ok = False)
-			self.PrepareComp( targetComp )
-			self.PrepareBuild( targetComp, _buildDir)
-			self.ExecuteBuild( _buildDir )
-			if publish: self.ExecutePublish( _buildDir )
-			self.ownerComp.op("logger").Log("Finished", _buildDir)
+			self.Prepare( targetComp )
+			self.Export( targetComp, _buildDir)
+			self.Build( _buildDir )
+			self.Publish( _buildDir )
+			# self.ownerComp.op("logger").Log("Finished", _buildDir)
 
-	def PrepareComp(self, targetComp:COMP):
+	def Prepare(self, targetComp:COMP):
 		metaComp = targetComp.op("Package_Meta") or self.createMetaComp(targetComp)
 		metaComp.par.clone.val = self.ownerComp.op("Package_Meta")
 		metaComp.par.enablecloningpulse.pulse()
@@ -109,7 +109,7 @@ class extForklift:
 		return Path( targetComp.save( Path(targetDir, targetComp.name).with_suffix(".tox")) )
 
 
-	def PrepareBuild(self, _targetComp:COMP, _buildDir):
+	def Export(self, _targetComp:COMP, _buildDir):
 		targetComp = self.ownerComp.op("Schleuse").copy( _targetComp )
 		metaComp = targetComp.op("Package_Meta")
 		
@@ -173,13 +173,13 @@ class extForklift:
 		targetComp.destroy()
 		return buildDir
 		
-	def ExecuteBuild(self, buildDir:Path):
+	def Build(self, buildDir:Path):
 		with self.ownerComp.op("TD_Conda").EnvShell() as BuildShell:
 			BuildShell.Execute(f"cd {buildDir.absolute()}")
 			BuildShell.Execute("python -m build")
 
 
-	def ExecutePublish(self, buildDir:Path):
+	def Publish(self, buildDir:Path):
 		"""
 			Actually Upload to the repository using twine.
 			Right now actually uses cloudsmith. Wold 
@@ -189,12 +189,3 @@ class extForklift:
 		with self.ownerComp.op("TD_Conda").EnvShell() as BuildShell:	
 			BuildShell.Execute(f"python -m twine upload {buildDir}\\dist\\*.whl -r {self.ownerComp.par.Index.eval()} --config-file .pypirc --verbose")
 		return
-		# Might not be needed actually
-		for _subItem in listdir(Path(buildDir, "dist")):
-			subItem = Path(buildDir, "dist", _subItem)
-			debug( subItem )
-			if subItem.is_file() and subItem.suffix == ".whl":
-				with self.ownerComp.op("TD_Conda").EnvShell() as BuildShell:
-					#BuildShell.Execute(f"cd {buildDir.absolute()}")
-					BuildShell.Execute(f"python -m twine upload -r cloudsmith {subItem} --config-file .pypirc")
-					break

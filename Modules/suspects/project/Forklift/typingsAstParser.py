@@ -6,7 +6,6 @@ Saveversion : 2023.31378
 Info Header End'''
 from ast import *
 
-
 def customParTree(targetComp:COMP):
     return ClassDef(
         name='CustomPars',
@@ -19,10 +18,11 @@ def customParTree(targetComp:COMP):
                     target=Name(id=customPar.name, ctx=Store()),
                     annotation=Name(id=f'Par{customPar.style}', ctx=Load()),
                     simple=1),
-                Expr(
-                    value=Constant(value=f"\n\t{customPar.style} Parameter\n{customPar.help}")
-                )
-              ]  for customPar in targetComp.customPars
+                Expr( value = Name('"""', ctx = Load())),
+                Expr( value = Name(f'{customPar.help}', ctx = Load())),
+                Expr( value = Name(f'Parameter Page : {customPar.page}', ctx = Load())),
+                Expr( value = Name('"""', ctx = Load()))
+            ]  for customPar in targetComp.customPars
         ], []),
         decorator_list=[]
     )
@@ -42,7 +42,7 @@ def importCompPars( targetComp:COMP):
     opType = targetComp.OPType[0].upper() + targetComp.OPType[1:]
     
     return ImportFrom(
-        module=f'tdi.ops.{targetComp.family.lower()}.{targetComp.OPType}',
+        module=f'tdi.ops.{targetComp.family.lower()}s.{targetComp.OPType}',
         names=[
             alias(name=f'{opType }Pars', asname="opPars")],
         level=0)
