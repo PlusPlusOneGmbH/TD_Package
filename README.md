@@ -25,7 +25,7 @@ A TDP should implement two attributes at minimum. ToxFile and Typing.
 #### ToxFile
 ```python
 from pathlib import Path
-ToxFile = Path( Path( __file__ ).parent, "Release.tox" )
+ToxFile = Path(__file__).parent / "Release.tox"
 ```
 Release-Tox in this case is a Placeholder Name and should be substituted with the actual name of the File. 
 The file needs to be next to the ```__init__.py``` for this to work
