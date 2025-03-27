@@ -12,6 +12,9 @@ import json
 import sys
 from os import listdir
 from uuid import uuid4
+import inspect
+from itertools import chain
+
 class extForklift:
 	"""
 	extForklift description
@@ -53,27 +56,48 @@ class extForklift:
 			if hasattr( targetComp.par, linkTarget[0]):
 				metaComp.par[linkTarget[1]].bindExpr = f"parent().par['{linkTarget[0]}']"
 	
+
+	def cleanExternalDependencies(self, targetComp, parName):
+		for childComp in targetComp.findChildren( parName = parName):
+			if "KeepExternal" in childComp.tags or childComp.par[parName].mode != ParMode.CONSTANT: continue
+			childComp.par[parName].val = ""
+	
+	def fetchDatDepdencies(self, moduleOp:textDAT ):
+		returnData =  [
+			op(_member[1].__module__) for _member in inspect.getmembers( mod(moduleOp) ) 
+			if (
+				_member[0] not in {"mod", "me", moduleOp.name} and 
+				hasattr(_member[1], "__module__") and 
+				op(_member[1].__module__) is not None and 
+				op(_member[1].__module__) is not moduleOp
+			)
+		]
+		return returnData + list(chain.from_iterable([self.fetchDatDepdencies( _dependencyModule ) for _dependencyModule in returnData]))
+
+
+	def fetchExtDependencies(self, compWithExtensions:COMP):
+		return [
+			op(extension.__module__) for extension in compWithExtensions.extensions
+		]
+
 	def SaveComp(self, targetComp:COMP, targetDir:Path):
 		# First we find all textDats that might be interresting for typehinting reasons. 
-
-		for textDat in targetComp.findChildren( type = textDAT):
-			if not textDat.par.file.eval(): continue
-			if "KeepExternal" in textDat.tags: continue
-			textDat.save(
+		self.cleanExternalDependencies( targetComp, "externaltox")
+		self.cleanExternalDependencies( targetComp, "file")
+		
+		# Lets iterate over all extensions
+		extensionDats = self.fetchExtDependencies( targetComp )
+		debug( [ self.fetchDatDepdencies( extensionDat ) for extensionDat in extensionDats] )
+		for moduleDat in set(extensionDats + list(chain.from_iterable( [ self.fetchDatDepdencies( extensionDat ) for extensionDat in extensionDats] ))) :
+			moduleDat.save(
 				Path( 
 					targetDir, 
-					*targetComp.relativePath( textDat ).split("/")[1:]
-				).with_name( Path(textDat.par.file.eval()).name),
+					*targetComp.relativePath( moduleDat ).split("/")[1:]
+				).with_name( moduleDat.name ).with_suffix( f".{moduleDat.par.extension.eval()}"),
 				createFolders=True
 			)
-
-			textDat.par.file.val = ""
 		
-		for childComp in targetComp.findChildren( type = COMP):
-			if "KeepExternal" in childComp.tags: continue
-			childComp.par.externaltox.val = ""
-		
-		return Path( targetComp.save( Path(targetDir, f"{targetComp.name}.tox")) )
+		return Path( targetComp.save( Path(targetDir, targetComp.name).with_suffix(".tox")) )
 
 
 	def PrepareBuild(self, _targetComp:COMP, _buildDir):
