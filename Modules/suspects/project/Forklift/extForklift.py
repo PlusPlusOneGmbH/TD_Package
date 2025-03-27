@@ -15,6 +15,8 @@ from uuid import uuid4
 import inspect
 from itertools import chain
 
+from typingsAstParser import createTypingModuleString
+
 class extForklift:
 	"""
 	extForklift description
@@ -23,12 +25,19 @@ class extForklift:
 		# The component to which this extension is attached
 		self.ownerComp = ownerComp
 
+	def _bindAssign(self, parentParName, targetParName, targetComp):
+		if targetComp.parent().par[parentParName]: targetComp.par[targetParName].bindExpr = f"parent().par['{parentParName}']"
+
 	def createMetaComp(self, targetComp):
 		metaComp:COMP = targetComp.copy(self.ownerComp.op("Package_Meta_Prefab"), name = "Package_Meta")
+		self._bindAssign( "Vcname", "Name", metaComp)
+		self._bindAssign( "Vcversion", "Version1", metaComp)
+		self._bindAssign( "Vcbuild", "Version2", metaComp)
 		ui.messageBox("New Setup", "It seems like you are preparing a COMP. Please take a moment to fill out some Meta-Data")
-		metaComp.openParameters()
-		metaComp.openViewer()
-		metaComp.op("ReadmeRepo").Repo.openViewer()
+		newPane = ui.panes.createFloating()
+		newPane.owner = targetComp
+		newPane.home( op = metaComp )
+		raise Exception("No Initialised!")
 		return metaComp
 
 
@@ -117,9 +126,6 @@ class extForklift:
 			Path(buildDir, "README.md")
 		)
 
-
-
-
 		with Path(buildDir, "pyproject.toml").open("+wt") as projectToml:
 			projectToml.write(
 				self.ownerComp.op("prefabPyProject").text.format(**{
@@ -158,6 +164,12 @@ class extForklift:
 					"Version" : f"{metaComp.par.Version1}.{metaComp.par.Version2}"
 				})
 			)
+
+		with Path( srcFolder , "_Typing.py").open("+wt") as typingFile:
+			typingFile.write(
+				createTypingModuleString( targetComp )
+			)
+		# 
 		targetComp.destroy()
 		return buildDir
 		
