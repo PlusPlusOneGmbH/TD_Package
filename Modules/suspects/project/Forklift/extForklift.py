@@ -110,6 +110,9 @@ class extForklift:
 
 
 	def Export(self, _targetComp:COMP, _buildDir):
+		for child in self.ownerComp.op("Schleuse").findChildren( depth = 1):
+			child.destroy()
+			
 		targetComp = self.ownerComp.op("Schleuse").copy( _targetComp )
 		metaComp = targetComp.op("Package_Meta")
 		
