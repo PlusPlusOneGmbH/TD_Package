@@ -10,3 +10,4 @@ Build/dist
 .docker
 .pypirc
 pip
+Build/jsonConfig

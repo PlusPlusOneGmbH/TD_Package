@@ -80,6 +80,13 @@ class extForklift:
 				op(_member[1].__module__) is not None and 
 				op(_member[1].__module__) is not moduleOp
 			)
+		] + [
+			op(_member[1]) for _member in inspect.getmembers( mod(moduleOp) ) 
+			if (
+				_member[0] not in {"mod", "me", moduleOp.name} and 
+				op(_member[1]) is not None and 
+				op(_member[1]) is not moduleOp
+			)
 		]
 		return returnData + list(chain.from_iterable([self.fetchDatDepdencies( _dependencyModule ) for _dependencyModule in returnData]))
 
@@ -96,7 +103,6 @@ class extForklift:
 		
 		# Lets iterate over all extensions
 		extensionDats = self.fetchExtDependencies( targetComp )
-		debug( [ self.fetchDatDepdencies( extensionDat ) for extensionDat in extensionDats] )
 		for moduleDat in set(extensionDats + list(chain.from_iterable( [ self.fetchDatDepdencies( extensionDat ) for extensionDat in extensionDats] ))) :
 			moduleDat.save(
 				Path( 
