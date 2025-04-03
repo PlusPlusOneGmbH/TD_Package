@@ -101,16 +101,21 @@ class extForklift:
 		self.cleanExternalDependencies( targetComp, "externaltox")
 		self.cleanExternalDependencies( targetComp, "file")
 		
-		# Lets iterate over all extensions
+		# Lets iterate over all dependency modules
 		extensionDats = self.fetchExtDependencies( targetComp )
+		targetComp.par.relpath.menuIndex = 2
 		for moduleDat in set(extensionDats + list(chain.from_iterable( [ self.fetchDatDepdencies( extensionDat ) for extensionDat in extensionDats] ))) :
-			moduleDat.save(
+			# Lets also actually set the refference!
+			savePath = moduleDat.save(
 				Path( 
 					targetDir, 
 					*targetComp.relativePath( moduleDat ).split("/")[1:]
 				).with_name( moduleDat.name ).with_suffix( f".{moduleDat.par.extension.eval()}"),
 				createFolders=True
 			)
+			# If that makes sense, to be testes. 
+			# We are basicly externalising all the python dependencies. Yaih!
+			moduleDat.par.file.val = Path( savePath ).relative_to( targetDir )
 		
 		return Path( targetComp.save( Path(targetDir, targetComp.name).with_suffix(".tox")) )
 
