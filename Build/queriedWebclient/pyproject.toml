@@ -12,7 +12,7 @@ readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
 requires-python = ">=3.11"
-keywords = ["TouchDesigner", "2023.31378", "Web", "REST", "HTTP", ""]
+keywords = ["TouchDesigner", "2023.31378", "Web"]
 classifiers = [
     "Programming Language :: Python :: 3",
     "Operating System :: Microsoft :: Windows"

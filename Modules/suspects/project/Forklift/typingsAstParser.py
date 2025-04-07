@@ -4,7 +4,9 @@ Author : Wieland PlusPlusOne@AMB-ZEPH15
 Saveorigin : Project.toe
 Saveversion : 2023.31378
 Info Header End'''
-from ast import *
+# This is fucking something up real hard here. WTF?
+# from ast import *
+from ast import ClassDef, Name, Expr, AnnAssign, ImportFrom, alias, Load, Pass, Subscript, Module, unparse,Store, FunctionDef, Raise, arguments, arg, Tuple, Call, If, Constant
 
 def customParTree(targetComp:COMP):
     return ClassDef(

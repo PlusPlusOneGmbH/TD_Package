@@ -11,3 +11,5 @@ Build/dist
 .pypirc
 pip
 Build/jsonConfig
+Build/qrcode
+Build/*

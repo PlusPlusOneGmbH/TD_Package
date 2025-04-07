@@ -10,7 +10,6 @@ from tempfile import TemporaryDirectory
 from pathlib import Path
 import json
 import sys
-from os import listdir
 from uuid import uuid4
 import inspect
 from itertools import chain
@@ -54,7 +53,7 @@ class extForklift:
 
 	def Prepare(self, targetComp:COMP):
 		metaComp = targetComp.op("Package_Meta") or self.createMetaComp(targetComp)
-		metaComp.par.clone.val = self.ownerComp.op("Package_Meta")
+		metaComp.par.clone.val = self.ownerComp.op("Package_Meta_Prefab")
 		metaComp.par.enablecloningpulse.pulse()
 		metaComp.par.clone.val = ""
 		for linkTarget in [
@@ -88,6 +87,7 @@ class extForklift:
 				op(_member[1]) is not moduleOp
 			)
 		]
+
 		return returnData + list(chain.from_iterable([self.fetchDatDepdencies( _dependencyModule ) for _dependencyModule in returnData]))
 
 
@@ -100,7 +100,7 @@ class extForklift:
 		# First we find all textDats that might be interresting for typehinting reasons. 
 		self.cleanExternalDependencies( targetComp, "externaltox")
 		self.cleanExternalDependencies( targetComp, "file")
-		
+
 		# Lets iterate over all dependency modules
 		extensionDats = self.fetchExtDependencies( targetComp )
 		targetComp.par.relpath.menuIndex = 2
@@ -121,12 +121,13 @@ class extForklift:
 
 
 	def Export(self, _targetComp:COMP, _buildDir):
-		for child in self.ownerComp.op("Schleuse").findChildren( depth = 1):
+		schleuse = op("/sys").op("Schleuse") or op("/sys").copy( self.ownerComp.op("Schleuse") )
+		for child in schleuse.findChildren( depth = 1):
 			child.destroy()
 			
-		targetComp = self.ownerComp.op("Schleuse").copy( _targetComp )
+		targetComp = schleuse.copy( _targetComp )
 		metaComp = targetComp.op("Package_Meta")
-		
+		metaComp.op("PreExportScriptRepo").Repo.run()
 			
 		buildDir = Path( _buildDir )
 		buildDir.mkdir(exist_ok=True, parents=True)
@@ -143,7 +144,7 @@ class extForklift:
 		with Path(buildDir, "pyproject.toml").open("+wt") as projectToml:
 			projectToml.write(
 				self.ownerComp.op("prefabPyProject").text.format(**{
-					"Name" : f"tdp-{metaComp.par.Name.eval()}",
+					"Name" : f"{self.ownerComp.par.Prefix.eval()}{metaComp.par.Name.eval()}",
 					"Version" : f"{metaComp.par.Version1}.{metaComp.par.Version2}",
 					"Dependencies" : json.dumps([
 						cell.val for cell in ( 
@@ -201,5 +202,5 @@ class extForklift:
 		if not Path(".pypirc").is_file():
 			raise Exception("Missing .pypirc file for twine!")
 		with self.ownerComp.op("TD_Conda").EnvShell() as BuildShell:	
-			BuildShell.Execute(f"python -m twine upload {buildDir}\\dist\\*.whl -r {self.ownerComp.par.Index.eval()} --config-file .pypirc --verbose")
+			BuildShell.Execute(f"python -m twine upload {buildDir}\\dist\\*.whl -r {self.ownerComp.par.Index.eval()} --config-file {self.ownerComp.par.Pypirc.eval()} --verbose")
 		return
