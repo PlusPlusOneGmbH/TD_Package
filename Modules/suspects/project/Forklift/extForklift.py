@@ -71,22 +71,37 @@ class extForklift:
 			childComp.par[parName].val = ""
 	
 	def fetchDatDepdencies(self, moduleOp:textDAT ):
-		returnData =  [
-			op(_member[1].__module__) for _member in inspect.getmembers( mod(moduleOp) ) 
-			if (
-				_member[0] not in {"mod", "me", moduleOp.name} and 
-				hasattr(_member[1], "__module__") and 
-				op(_member[1].__module__) is not None and 
-				op(_member[1].__module__) is not moduleOp
-			)
-		] + [
-			op(_member[1]) for _member in inspect.getmembers( mod(moduleOp) ) 
-			if (
-				_member[0] not in {"mod", "me", moduleOp.name} and 
-				op(_member[1]) is not None and 
-				op(_member[1]) is not moduleOp
-			)
-		]
+		returnData = []
+		try:
+			returnData += [
+				op(_member[1].__module__) for _member in inspect.getmembers( mod(moduleOp) ) 
+				if (
+					_member[0] not in {"mod", "me", moduleOp.name} and 
+					hasattr(_member[1], "__module__") and 
+					op(_member[1].__module__) is not None and 
+					op(_member[1].__module__) is not moduleOp
+				)
+			]
+		except tdError as e:
+			# TBH not sure why but there is some strange behaviour when releasing Forklift itself? I suppose it is sensible to just skip stuff then.
+			pass
+			# debug("Error while fetching dependencies", e)
+		
+		try:
+			returnData +=[
+				op(_member[1]) for _member in inspect.getmembers( mod(moduleOp) ) 
+				if (
+					_member[0] not in {"mod", "me", moduleOp.name} and 
+					op(_member[1]) is not None and 
+					op(_member[1]) is not moduleOp
+				)
+			]
+		except tdError as e:
+			# TBH not sure why but there is some strange behaviour when releasing Forklift itself? I suppose it is sensible to just skip stuff then.
+			pass
+			# debug("Error while fetching dependencies", e)
+
+		
 
 		return returnData + list(chain.from_iterable([self.fetchDatDepdencies( _dependencyModule ) for _dependencyModule in returnData]))
 
@@ -119,6 +134,9 @@ class extForklift:
 		
 		return Path( targetComp.save( Path(targetDir, targetComp.name).with_suffix(".tox")) )
 
+
+	def validateMeta(self, targetComp:COMP):
+		pass
 
 	def Export(self, _targetComp:COMP, _buildDir):
 		schleuse = op("/sys").op("Schleuse") or op("/sys").copy( self.ownerComp.op("Schleuse") )
