@@ -36,9 +36,10 @@ class extPowderMonkey:
 		).json().get("projects", []) if project["name"].startswith(prefixes) }
 	
 	def Get(self, moduleName, prefix = "", package = ""):
-		with self.ownerComp.op("td_pip").MountModule( 
+		with self.ownerComp.op("TD_uv").MountModule( 
 			moduleName, 
-			package or self.IndexData.get(moduleName, {}).get("package", None) or moduleName) as mountedModule:
+			package or self.IndexData.get(moduleName, {}).get("package", None) or moduleName,
+			additionalSettings = ["--index", self.ownerComp.par.Index.eval() ]) as mountedModule:
 			return mountedModule.ToxFile
 	
 	@property
