@@ -10,7 +10,6 @@ from functools import cache
 class extPowderMonkey:
 	def __init__(self, ownerComp):
 		self.ownerComp = ownerComp
-		return self.fetchIndexData( 
 		self.UV = self.ownerComp.op("TD_uv")
 	
 	# We need to see if the caching actually is a good idea but it certainly is required 
