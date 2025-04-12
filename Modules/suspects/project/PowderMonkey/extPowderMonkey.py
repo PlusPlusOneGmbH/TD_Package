@@ -4,61 +4,42 @@ Author : Wieland PlusPlusOne@AMB-ZEPH15
 Saveorigin : Project.toe
 Saveversion : 2023.31378
 Info Header End'''
-import requests
-from functools import lru_cache
-import asyncio
 
-def removePrefixes(name:str, prefixes:tuple[str]):
-	for prefix in prefixes:
-		name = name.removeprefix( prefix )
-	return name
+from functools import cache
 
 class extPowderMonkey:
 	def __init__(self, ownerComp):
 		self.ownerComp = ownerComp
-		
-	@property
-	def IndexData(self):
 		return self.fetchIndexData( 
-			self.ownerComp.par.Index.eval(), 
-			tuple(tdu.split( self.ownerComp.par.Prefixes.eval()))
-		)
+		self.UV = self.ownerComp.op("TD_uv")
 	
-	@lru_cache(maxsize=1)
-	def fetchIndexData(self, index, prefixes):
-		return { removePrefixes(project["name"], prefixes ) :{ 
-				"package" : project["name"] 
-			} for project in requests.get(
-			index, 
-			headers = {
-				"Accept" : "application/vnd.pypi.simple.v1+json"
-			}
-		).json().get("projects", []) if project["name"].startswith(prefixes) }
-	
-	def Get(self, moduleName, prefix = "", package = ""):
+	# We need to see if the caching actually is a good idea but it certainly is required 
+	# as TD_UV as a shitty habbit of doing a quick subcall.
+	# So yeah, maybe should fix it there too.
+	# Non the less, GetTox gets calles evera time a comp Cook!
+	@cache
+	def GetTox(self, moduleName, prefix = "", package = "", index = ""):
+		packageName = f"{prefix or self.ownerComp.par.Prefix.eval()}-{moduleName or package}"
 		with self.ownerComp.op("TD_uv").MountModule( 
 			moduleName, 
-			package or self.IndexData.get(moduleName, {}).get("package", None) or moduleName,
-			additionalSettings = ["--index", self.ownerComp.par.Index.eval() ]) as mountedModule:
+			packageName,
+			additionalSettings = ["--index", index or self.ownerComp.par.Index.eval() ]) as mountedModule:
 			return mountedModule.ToxFile
-	
-	@property
-	def asyncio(self):
-		# Global dependencyhandling is also a topic that needs to be handled here.
-		# Can we use ourself to handle thhis? Lol
-		return getattr( op, "AsyncIO", self.ownerComp.op("TDAsyncIO") )
+		
+	def GetGlobalComp(self, moduleName, prefix = "", package = "", index = "", globalShortcut = "", globalPath = ""):
+		_globalShortcut = globalShortcut or f"{self.ownerComp.par.Globalshortcutprefix.eval()}_{moduleName}"
+		potentialGlobalComp = getattr( op, _globalShortcut, None )
+		if potentialGlobalComp: return potentialGlobalComp
 
-	def Place(self, name, prefix = "tdp-", package = ""):
-		self.ownerComp.op("TDAsyncIO").RunAsync( self.AsyncPlace( name, prefix, package))
+		_placePath = globalPath or self.ownerComp.par.Globalpath.eval()
+		currentComp = op("/")
+		for pathElement in _placePath.split("/"):
+			currentComp = currentComp.op(pathElement) or currentComp.create(baseCOMP, pathElement)
+		
+		placeComp = currentComp
+		localPM = placeComp.op("_PowderMonkey") or placeComp.copy( self.ownerComp, name = "_PowderMonkey")
 
-	async def AsyncPlace(self, name, prefix = "tdp-", package = ""):
-		toBePlaced:COMP = self.ownerComp.op("_").copy(self.ownerComp.op("Proxy"), name = name)
-		ui.panes.current.placeOPs([toBePlaced])
-		while toBePlaced and toBePlaced.parent() == self.ownerComp.op("_"):
-			await asyncio.sleep(0)
-		# toBePlaced.par.externaltox.expr = f"op('{self.ownerComp.path}').Get('{name}', '{prefix}', '{package}')"
-		toBePlaced.par.externaltox.expr = f"op('{self.ownerComp.path}').Get('{name}')"
-		toBePlaced.par.enableexternaltoxpulse.pulse()
-		toBePlaced.par.reloadcustom.val = False
-		toBePlaced.par.reloadbuiltin.val = False
-		toBePlaced.par.savebackup.val = False
+		loadedComp = placeComp.loadTox( self.GetTox(moduleName, prefix, package, index) )
+		loadedComp.par.opshortcut = _globalShortcut
+		loadedComp.par.externaltox.expr = f"op('_PowderMonkey').GetTox( '{moduleName}', '{prefix or self.ownerComp.par.Prefix.eval()}', '{package}', '{index or self.ownerComp.par.Index.eval()}' )"
+		return loadedComp

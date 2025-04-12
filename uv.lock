@@ -7,14 +7,25 @@ name = "td-package"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "tdp-examplecomp" },
     { name = "tdp-jsonconfig" },
     { name = "tdp-queriedwebclient" },
 ]
 
 [package.metadata]
 requires-dist = [
+    { name = "tdp-examplecomp", specifier = ">=0.7" },
     { name = "tdp-jsonconfig", specifier = ">=2.14" },
     { name = "tdp-queriedwebclient", specifier = ">=1.11" },
+]
+
+[[package]]
+name = "tdp-examplecomp"
+version = "0.7"
+source = { registry = "https://test.pypi.org/simple/" }
+sdist = { url = "https://test-files.pythonhosted.org/packages/bc/e7/fc952e9ab4582426daac16b36f3bf3307e7eae2b2a133d1517a088da7cbb/tdp_examplecomp-0.7.tar.gz", hash = "sha256:4487a52c00c080a129f8e241f6bfdcafbe7f72712d6d09227830d9730fde9d04", size = 22881 }
+wheels = [
+    { url = "https://test-files.pythonhosted.org/packages/ea/38/a1aefa9533501d7db86c65808fdc2f4d7dbca0f48c9a8f2ccb7c1d293eef/tdp_examplecomp-0.7-py3-none-any.whl", hash = "sha256:b8886561ac3ce69372127bb6ed7ea09e13c90652edfaa6640838c80c2ab11272", size = 22455 },
 ]
 
 [[package]]
