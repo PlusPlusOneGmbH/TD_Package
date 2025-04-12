@@ -8,10 +8,10 @@ from tempfile import TemporaryDirectory
 from pathlib import Path
 import json
 import sys
-from os import listdir
 from uuid import uuid4
 import inspect
 from itertools import chain
+from typingsAstParser import createTypingModuleString
 
 class extForklift:
     """
@@ -22,13 +22,16 @@ class extForklift:
         self.ownerComp = ownerComp
         pass
 
+    def _bindAssign(self, parentParName, targetParName, targetComp):
+        pass
+
     def createMetaComp(self, targetComp):
         pass
 
-    def Build(self, targetComp, publish=True, TempOutput=True):
+    def Rundown(self, targetComp, TempOutput=True):
         pass
 
-    def PrepareComp(self, targetComp: COMP):
+    def Prepare(self, targetComp: COMP):
         pass
 
     def cleanExternalDependencies(self, targetComp, parName):
@@ -43,13 +46,16 @@ class extForklift:
     def SaveComp(self, targetComp: COMP, targetDir: Path):
         pass
 
-    def PrepareBuild(self, _targetComp: COMP, _buildDir):
+    def validateMeta(self, targetComp: COMP):
         pass
 
-    def ExecuteBuild(self, buildDir: Path):
+    def Export(self, _targetComp: COMP, _buildDir):
         pass
 
-    def ExecutePublish(self, buildDir: Path):
+    def Build(self, buildDir: Path):
+        pass
+
+    def Publish(self, buildDir: Path):
         """
 			Actually Upload to the repository using twine.
 			Right now actually uses cloudsmith. Wold 

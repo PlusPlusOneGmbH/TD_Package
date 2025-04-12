@@ -14,7 +14,7 @@ from uuid import uuid4
 import inspect
 from itertools import chain
 
-from typingsAstParser import createTypingModuleString
+from CustomTypingsAstParser import createTypingModuleString
 
 class extForklift:
 	"""
@@ -121,6 +121,12 @@ class extForklift:
 		targetComp.par.relpath.menuIndex = 2
 		for moduleDat in set(extensionDats + list(chain.from_iterable( [ self.fetchDatDepdencies( extensionDat ) for extensionDat in extensionDats] ))) :
 			# Lets also actually set the refference!
+			
+
+			# There are some strange issues where the algo fetches old refferences I assume when copying.
+			# Lets check that we are actually in the targetComp.
+			if not moduleDat.path.startswith( targetComp.path ): continue
+	
 			savePath = moduleDat.save(
 				Path( 
 					targetDir, 
@@ -130,6 +136,7 @@ class extForklift:
 			)
 			# If that makes sense, to be testes. 
 			# We are basicly externalising all the python dependencies. Yaih!
+
 			moduleDat.par.file.val = Path( savePath ).relative_to( targetDir )
 		
 		return Path( targetComp.save( Path(targetDir, targetComp.name).with_suffix(".tox")) )
@@ -146,7 +153,9 @@ class extForklift:
 		targetComp = schleuse.copy( _targetComp )
 		metaComp = targetComp.op("Package_Meta")
 		metaComp.op("PreExportScriptRepo").Repo.run()
-			
+		
+		(metaComp.op("pre_release") or self.ownerComp.op("empty")).run()
+
 		buildDir = Path( _buildDir )
 		buildDir.mkdir(exist_ok=True, parents=True)
 		metaComp.op("LicenseRepo").Repo.save(
@@ -207,9 +216,12 @@ class extForklift:
 		return buildDir
 		
 	def Build(self, buildDir:Path):
-		with self.ownerComp.op("TD_Conda").EnvShell() as BuildShell:
-			BuildShell.Execute(f"cd {buildDir.absolute()}")
-			BuildShell.Execute("python -m build")
+		self.ownerComp.op("TD_uv").Run([ "build", str(buildDir), 
+								  # Idealy we do not need to do this. Can I jsut pass the index?
+								  "--index-strategy", "unsafe-best-match" ])
+		# with self.ownerComp.op("TD_Conda").EnvShell() as BuildShell:
+		#	BuildShell.Execute(f"cd {buildDir.absolute()}")
+		#	BuildShell.Execute("python -m build")
 
 
 	def Publish(self, buildDir:Path):
@@ -217,8 +229,11 @@ class extForklift:
 			Actually Upload to the repository using twine.
 			Right now actually uses cloudsmith. Wold 
 		"""
-		if not Path(".pypirc").is_file():
-			raise Exception("Missing .pypirc file for twine!")
-		with self.ownerComp.op("TD_Conda").EnvShell() as BuildShell:	
-			BuildShell.Execute(f"python -m twine upload {buildDir}\\dist\\*.whl -r {self.ownerComp.par.Index.eval()} --config-file {self.ownerComp.par.Pypirc.eval()} --verbose")
+		self.ownerComp.op("TD_uv").Run([ "publish", 
+								  "--directory", str(buildDir), 
+								  "--publish-url", self.ownerComp.par.Index.eval() ] + (
+									[ "--token", self.ownerComp.par.Token.eval() ] * bool( self.ownerComp.par.Token.eval() )
+									)
+								)
+			# BuildShell.Execute(f"python -m twine upload {buildDir}\\dist\\*.whl -r {self.ownerComp.par.Index.eval()} --config-file {self.ownerComp.par.Pypirc.eval()} --verbose")
 		return

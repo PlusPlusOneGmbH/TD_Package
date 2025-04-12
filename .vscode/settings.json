@@ -3,6 +3,7 @@
     "python.analysis.extraPaths": [
         "Lib",
         "TDImportCache/Lib",
+        ".venv/Lib/site-packages"
     ],
     "python.defaultInterpreterPath": "C:/Program Files/Derivative/TouchDesigner.2023.31378/bin"
 }
