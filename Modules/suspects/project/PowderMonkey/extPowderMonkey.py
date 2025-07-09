@@ -12,6 +12,7 @@ class extPowderMonkey:
 		self.ownerComp = ownerComp
 		self.UV = self.ownerComp.op("TD_uv")
 	
+	
 	# We need to see if the caching actually is a good idea but it certainly is required 
 	# as TD_UV as a shitty habbit of doing a quick subcall.
 	# So yeah, maybe should fix it there too.
