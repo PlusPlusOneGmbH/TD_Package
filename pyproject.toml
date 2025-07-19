@@ -4,8 +4,12 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.11.1"
+
+# We have to be carefull with these if we want to use the repo as a package collection.
 dependencies = [
-    
+   # "tdp-examplecomp>=0.7",
+   # "tdp-jsonconfig>=2.14",
+   # "tdp-queriedwebclient>=1.11",
 ]
 
 [[tool.uv.index]]
