@@ -3,18 +3,19 @@ name = "td-package"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.11.1"
+requires-python = "==3.11.1"
 
-# We have to be carefull with these if we want to use the repo as a package collection.
+# If we want to distribute this as a collection, all dependencies have to also be defined in here!
+# Use TD-UV to install the packages and this should be taken care of.
+# Just a caviat.
 dependencies = [
    "pydantic>=1.5a1",
 ]
 
-[[tool.uv.index]]
-url = "https://test.pypi.org/simple/"
-
-
 [tool.setuptools]
-# ...
+# Only look in to Packages for packages when installing this in root.
 package-dir = {"" = "Packages"}
-packages = ["ExampleComp"]
+
+[tool.setuptools.package-data]
+# Include tox files :)
+"*" = ["*.tox"]
