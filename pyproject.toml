@@ -14,5 +14,7 @@ dependencies = [
 url = "https://test.pypi.org/simple/"
 
 
-[tool.setuptools.packages.find]
-where = ["Packages"]
+[tool.setuptools]
+# ...
+package-dir = {"" = "Packages"}
+packages = ["ExampleComp"]
