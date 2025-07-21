@@ -1,7 +1,0 @@
-services:
-  devpi:
-    image: lordgaav/devpi:latest
-    ports:
-      - 3141:3141
-    volumes:
-      - .docker/devpi:/devpi

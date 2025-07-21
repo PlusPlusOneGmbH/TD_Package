@@ -1,6 +1,0 @@
-{
-    "Trigger22" : {
-        "arguments"     : [ "length:float" ],
-        "optional"		: [ "optional:str='hello'"]
-    } 
-}
