@@ -11,6 +11,7 @@ from pathlib import Path
 import json
 import sys
 import os
+from shutil import rmtree
 from uuid import uuid4
 import inspect
 from itertools import chain
@@ -151,6 +152,12 @@ class extForklift:
 		pass
 
 	def Export(self, _targetComp:COMP, _buildDir):
+
+		try:
+			rmtree( _buildDir )
+		except FileNotFoundError:
+			pass
+		
 		schleuse = op("/sys").op("Schleuse") or op("/sys").copy( self.ownerComp.op("Schleuse") )
 		for child in schleuse.findChildren( depth = 1):
 			child.destroy()
@@ -163,6 +170,8 @@ class extForklift:
 
 		buildDir = Path( _buildDir )
 		
+		
+
 		buildDir.mkdir(exist_ok=True, parents=True)
 		metaComp.op("LicenseRepo").Repo.save(
 			Path(buildDir, "LICENSE")

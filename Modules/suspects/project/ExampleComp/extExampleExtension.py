@@ -18,4 +18,4 @@ class extExampleExtension:
 		pass
 		
 	def Hello(self, str) -> COMP:
-		return sef.ownerComp
+		return self.ownerComp

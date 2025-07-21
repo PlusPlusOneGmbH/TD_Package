@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tdp-ExampleComp"
-version = "0.8"
+version = "0.9"
 dependencies = ["pydantic"]
 authors = [{"name"= "Wieland Hilker", "email"= "Wieland@PlusPlus.One"}]
 description = "We are just testing some stuff, ok?"
