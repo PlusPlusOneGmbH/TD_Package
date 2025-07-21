@@ -75,7 +75,7 @@ Using the if TYPE_CHECKING clause keeps users from trying to import the actual p
 ## Forklift
 Forklift is packaging tool that creates and uploads ready packages to indizes like Pip from a Component inside TouchDesigner.
 
-It utilises TD_Conda to allow for a handsoff, internal approach. The output is a legal package that follows the rules of TDP defined above. 
+It utilises TD_UV to allow for a handsoff, internal approach. The output is a legal package that follows the rules of TDP defined above. 
 
 It makes use of a PackageMeta component that allows for modification of behaviour if required.
 
