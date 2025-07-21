@@ -10,6 +10,7 @@ from tempfile import TemporaryDirectory
 from pathlib import Path
 import json
 import sys
+import os
 from uuid import uuid4
 import inspect
 from itertools import chain
@@ -141,8 +142,9 @@ class extForklift:
 			# We are basicly externalising all the python dependencies. Yaih!
 
 			moduleDat.par.file.val = Path( savePath ).relative_to( targetDir )
-		
-		return Path( targetComp.save( Path(targetDir, targetComp.name).with_suffix(".tox")) )
+		savePath = Path(targetDir, targetComp.name).with_suffix(".tox")
+		targetComp.par.externaltox.val = savePath
+		return Path( targetComp.save(savePath) )
 
 
 	def validateMeta(self, targetComp:COMP):
@@ -160,6 +162,7 @@ class extForklift:
 		(metaComp.op("pre_release") or self.ownerComp.op("empty")).run()
 
 		buildDir = Path( _buildDir )
+		
 		buildDir.mkdir(exist_ok=True, parents=True)
 		metaComp.op("LicenseRepo").Repo.save(
 			Path(buildDir, "LICENSE")
@@ -172,9 +175,12 @@ class extForklift:
 		)
 
 		# Lets find TD_UV and silently add the dependencies!
-		for child in targetComp.findChildren(depth = 1):
-			if child.par.Vcname.eval() == "TD_Uv" and child.par.Vcversion.eval() >= 0 and child.par.Vcbuild.eval() >= 35:
-				child.InstallDependencyTable( additional_settings = "--freeze" )
+		if targetComp.op("dependencies"):
+			for row in targetComp.op("dependencies").rows():
+				installData = [cell.val for cell in row if cell.val]
+				self.ownerComp.op("TD_uv").InstallPackage( installData[0], installData[1:] + ["--project", str(buildDir), "--frozen"])
+
+
 
 		with Path(buildDir, "pyproject.toml").open("+wt") as projectToml:
 			projectToml.write(

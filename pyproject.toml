@@ -10,6 +10,7 @@ dependencies = [
    # "tdp-examplecomp>=0.7",
    # "tdp-jsonconfig>=2.14",
    # "tdp-queriedwebclient>=1.11",
+   "pydantic>=1.5a1",
 ]
 
 [[tool.uv.index]]

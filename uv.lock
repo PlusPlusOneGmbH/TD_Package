@@ -1,45 +1,23 @@
 version = 1
-revision = 1
+revision = 2
 requires-python = ">=3.11.1"
+
+[[package]]
+name = "pydantic"
+version = "1.5a1"
+source = { registry = "https://test.pypi.org/simple/" }
+sdist = { url = "https://test-files.pythonhosted.org/packages/6d/3f/9f3b82be7de7770696d994a2fbdd10e8a28698c0496fc3331c88b1545c52/pydantic-1.5a1.tar.gz", hash = "sha256:2c2a75e3f49937666f47888c785aafde489b148f2a32ef1fb75afbdcf31eed60", size = 109714, upload-time = "2020-03-21T13:32:55.187Z" }
+wheels = [
+    { url = "https://test-files.pythonhosted.org/packages/25/9c/c1c21dc30d7af10c7b943a33853f02e439fa7eb4bbe611266e60c6d08e8b/pydantic-1.5a1-py36.py37.py38-none-any.whl", hash = "sha256:c54cd1cc7a88b8c4dabd3ebe5a82c2a2e4bc091139198d394ac92c425fe667ab", size = 91980, upload-time = "2020-03-21T13:32:53.462Z" },
+]
 
 [[package]]
 name = "td-package"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
-    { name = "tdp-examplecomp" },
-    { name = "tdp-jsonconfig" },
-    { name = "tdp-queriedwebclient" },
+    { name = "pydantic" },
 ]
 
 [package.metadata]
-requires-dist = [
-    { name = "tdp-examplecomp", specifier = ">=0.7" },
-    { name = "tdp-jsonconfig", specifier = ">=2.14" },
-    { name = "tdp-queriedwebclient", specifier = ">=1.11" },
-]
-
-[[package]]
-name = "tdp-examplecomp"
-version = "0.7"
-source = { registry = "https://test.pypi.org/simple/" }
-sdist = { url = "https://test-files.pythonhosted.org/packages/bc/e7/fc952e9ab4582426daac16b36f3bf3307e7eae2b2a133d1517a088da7cbb/tdp_examplecomp-0.7.tar.gz", hash = "sha256:4487a52c00c080a129f8e241f6bfdcafbe7f72712d6d09227830d9730fde9d04", size = 22881 }
-wheels = [
-    { url = "https://test-files.pythonhosted.org/packages/ea/38/a1aefa9533501d7db86c65808fdc2f4d7dbca0f48c9a8f2ccb7c1d293eef/tdp_examplecomp-0.7-py3-none-any.whl", hash = "sha256:b8886561ac3ce69372127bb6ed7ea09e13c90652edfaa6640838c80c2ab11272", size = 22455 },
-]
-
-[[package]]
-name = "tdp-jsonconfig"
-version = "2.14"
-source = { registry = "https://test.pypi.org/simple/" }
-wheels = [
-    { url = "https://test-files.pythonhosted.org/packages/2c/ee/481965754499301cf98e55cb9555d6d380e4c3df7370b01132f578143a9b/tdp_jsonconfig-2.14-py3-none-any.whl", hash = "sha256:f8609e1aa48388c39416feda66b434fbbcb046ebb3ba8f8c53e111e64e7b2148", size = 43286 },
-]
-
-[[package]]
-name = "tdp-queriedwebclient"
-version = "1.11"
-source = { registry = "https://test.pypi.org/simple/" }
-wheels = [
-    { url = "https://test-files.pythonhosted.org/packages/2e/2d/b639677bd3e5539a04880cd077bfaf66b17bf093a38f112d90ff539def4f/tdp_queriedwebclient-1.11-py3-none-any.whl", hash = "sha256:e0d6c7c12a48e695438191e1a13e4bb455951518c6f8cff038f31a326e9c8fc0", size = 52536 },
-]
+requires-dist = [{ name = "pydantic", specifier = ">=1.5a1" }]
