@@ -2,7 +2,7 @@
 Name : extForklift
 Author : Wieland PlusPlusOne@AMB-ZEPH15
 Saveorigin : Project.toe
-Saveversion : 2023.31378
+Saveversion : 2025.30060
 Info Header End'''
 
 
@@ -118,7 +118,10 @@ class extForklift:
 
 		# Lets iterate over all dependency modules
 		extensionDats = self.fetchExtDependencies( targetComp )
+
+		# All future refferences t external files are now in relation to the position of the tox file. At least they should.
 		targetComp.par.relpath.menuIndex = 2
+
 		for moduleDat in set(extensionDats + list(chain.from_iterable( [ self.fetchDatDepdencies( extensionDat ) for extensionDat in extensionDats] ))) :
 			# Lets also actually set the refference!
 			
@@ -168,6 +171,11 @@ class extForklift:
 			Path(buildDir, "README.md")
 		)
 
+		# Lets find TD_UV and silently add the dependencies!
+		for child in targetComp.findChildren(depth = 1):
+			if child.par.Vcname.eval() == "TD_Uv" and child.par.Vcversion.eval() >= 0 and child.par.Vcbuild.eval() >= 35:
+				child.InstallDependencyTable( additional_settings = "--freeze" )
+
 		with Path(buildDir, "pyproject.toml").open("+wt") as projectToml:
 			projectToml.write(
 				self.ownerComp.op("prefabPyProject").text.format(**{
@@ -216,12 +224,11 @@ class extForklift:
 		return buildDir
 		
 	def Build(self, buildDir:Path):
-		self.ownerComp.op("TD_uv").Run([ "build", str(buildDir), 
-								  # Idealy we do not need to do this. Can I jsut pass the index?
-								  "--index-strategy", "unsafe-best-match" ])
-		# with self.ownerComp.op("TD_Conda").EnvShell() as BuildShell:
-		#	BuildShell.Execute(f"cd {buildDir.absolute()}")
-		#	BuildShell.Execute("python -m build")
+		self.ownerComp.op("TD_uv").Run([ 
+			"build", str(buildDir), 
+			 "--index-strategy", 
+			 "unsafe-best-match" ]
+		)
 
 
 	def Publish(self, buildDir:Path):
@@ -235,5 +242,4 @@ class extForklift:
 									[ "--token", self.ownerComp.par.Token.eval() ] * bool( self.ownerComp.par.Token.eval() )
 									)
 								)
-			# BuildShell.Execute(f"python -m twine upload {buildDir}\\dist\\*.whl -r {self.ownerComp.par.Index.eval()} --config-file {self.ownerComp.par.Pypirc.eval()} --verbose")
 		return
