@@ -1,4 +1,8 @@
 
+# This Repo has been rolled up in to : https://github.com/PlusPlusOneGmbH/tdp-MVP and is archived. No further implementations and or changes will occur.
+
+
+
 ![Firefly a euro palette full of different crates and boxes filled to the brim with bananas 20284](https://github.com/user-attachments/assets/f99a642a-b3c6-42c8-9f2a-f17d1e444678)
 
 # A proposal for PackageManagement in TouchDesigner
